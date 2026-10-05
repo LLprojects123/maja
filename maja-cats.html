@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Maja's Cat Page</title>
+<style>
+:root{--bg:#fff3fa;--ink:#2a1236;--pink:#ff3d9a;--violet:#7a3cff;--card:#ffffff;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1a0b26;--ink:#ffe9f6;--card:#2b1340}}
+:root[data-theme="dark"]{--bg:#1a0b26;--ink:#ffe9f6;--card:#2b1340}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Baloo 2","Trebuchet MS",system-ui,sans-serif;line-height:1.5;overflow-x:hidden}
+#rainbow{position:fixed;inset:0;z-index:0;opacity:0;pointer-events:none;
+background:linear-gradient(115deg,#ff0040,#ff9900,#ffee00,#22dd44,#00ccff,#5533ff,#ff00cc,#ff0040);background-size:300% 300%}
+#field{position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden}
+#field span{position:absolute;left:0;top:0;will-change:transform;user-select:none}
+main{position:relative;z-index:2;max-width:640px;margin:0 auto;padding:28px 18px 120px}
+h1{font-size:clamp(2.4rem,11vw,4.2rem);line-height:1;margin:.2em 0 .1em;color:var(--pink);transform:rotate(-2deg)}
+.sub{font-size:1.2rem;margin:0 0 22px}
+.card{background:var(--card);border:3px solid var(--ink);border-radius:22px 6px 22px 6px;padding:16px 18px;margin:16px 0}
+.card h2{margin:0 0 6px;font-size:1.3rem;color:var(--violet)}
+.card p,.card ul{margin:0}
+ul{padding-left:1.2em}
+button{font:inherit;font-weight:800;cursor:pointer;border:3px solid var(--ink);border-radius:999px;padding:12px 22px;color:#fff;background:var(--pink);box-shadow:4px 4px 0 var(--ink)}
+button:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink)}
+button:focus-visible{outline:4px solid var(--violet);outline-offset:3px}
+#cats{margin-top:8px;font-size:1.6rem;min-height:2.2rem}
+.warn{font-size:.9rem;opacity:.8;margin-top:8px}
+#go{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:5;font-size:1.15rem;white-space:nowrap}
+#go:active{transform:translateX(-50%) translate(3px,3px)}
+body.crazy #rainbow{opacity:1;animation:flash .35s linear infinite,slide 1.2s linear infinite}
+body.crazy h1{animation:wob .25s ease-in-out infinite alternate}
+body.crazy .card{background:rgba(255,255,255,.88);color:#2a1236}
+@keyframes flash{to{filter:hue-rotate(360deg)}}
+@keyframes slide{to{background-position:300% 300%}}
+@keyframes wob{from{transform:rotate(-6deg) scale(1)}to{transform:rotate(5deg) scale(1.08)}}
+@media (prefers-reduced-motion:reduce){body.crazy #rainbow{animation:flash 6s linear infinite}body.crazy h1{animation:none}}
+</style>
+</head>
+<body>
+<div id="rainbow"></div>
+<div id="field"></div>
+<main>
+  <h1>Maja's Cat Page 🐱</h1>
+  <p class="sub">Welcome. Everything here is about cats. Nothing else matters.</p>
+
+  <div class="card">
+    <h2>About me</h2>
+    <p>Hi, I'm Maja. I love cats more than people, snacks, and sleep. Most days I'm just looking for a cat to say hi to.</p>
+  </div>
+
+  <div class="card">
+    <h2>Cat rules</h2>
+    <ul>
+      <li>If a cat sits on you, you cannot move. That's the law.</li>
+      <li>Every cat gets a name, even strangers.</li>
+      <li>3 a.m. zoomies are a feature, not a bug.</li>
+      <li>Knocking things off tables is art.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>Pick your cat mood</h2>
+    <p>Tap to see how I'm feeling:</p>
+    <p id="cats">😺</p>
+    <button id="mood" type="button">Change mood</button>
+  </div>
+
+  <p class="warn">Crazy mode has flashing colors and fast movement. Skip it if that bothers you.</p>
+</main>
+<button id="go" type="button" aria-pressed="false">🌈 Crazy mode</button>
+
+<script>
+(function(){
+  var faces=["😺","😸","😹","😻","😼","😽","🙀","😿","😾","🐱","🐈","🐈‍⬛","🐾"];
+  var moods=["😺 happy","😻 in love with a cat","😼 plotting","🙀 shocked (cat did something)","😴 napping with a cat","😹 laughing at cat fails"];
+  var mi=0, mood=document.getElementById("mood"), out=document.getElementById("cats");
+  out.textContent=moods[0];
+  mood.addEventListener("click",function(){mi=(mi+1)%moods.length;out.textContent=moods[mi];});
+
+  var field=document.getElementById("field"), go=document.getElementById("go"), cats=[], raf=null, on=false;
+  function rnd(a,b){return a+Math.random()*(b-a);}
+  function spawn(n){
+    for(var i=0;i<n;i++){
+      var s=document.createElement("span"), size=rnd(26,70);
+      s.textContent=faces[Math.floor(Math.random()*faces.length)];
+      s.style.fontSize=size+"px";
+      field.appendChild(s);
+      cats.push({el:s,x:rnd(0,innerWidth-size),y:rnd(0,innerHeight-size),vx:rnd(5,13)*(Math.random()<.5?-1:1),vy:rnd(5,13)*(Math.random()<.5?-1:1),r:0,vr:rnd(-14,14),size:size});
+    }
+  }
+  function tick(){
+    var w=innerWidth,h=innerHeight;
+    for(var i=0;i<cats.length;i++){
+      var c=cats[i];
+      c.x+=c.vx;c.y+=c.vy;c.r+=c.vr;
+      if(c.x<0){c.x=0;c.vx=Math.abs(c.vx);}
+      if(c.x>w-c.size){c.x=w-c.size;c.vx=-Math.abs(c.vx);}
+      if(c.y<0){c.y=0;c.vy=Math.abs(c.vy);}
+      if(c.y>h-c.size){c.y=h-c.size;c.vy=-Math.abs(c.vy);}
+      c.el.style.transform="translate("+c.x+"px,"+c.y+"px) rotate("+c.r+"deg)";
+    }
+    raf=requestAnimationFrame(tick);
+  }
+  function start(){
+    on=true;document.body.classList.add("crazy");
+    var reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+    spawn(reduce?12:55);
+    if(reduce){cats.forEach(function(c){c.vx/=3;c.vy/=3;c.vr/=3;});}
+    tick();
+    go.textContent="🛑 Calm down";go.setAttribute("aria-pressed","true");
+  }
+  function stop(){
+    on=false;document.body.classList.remove("crazy");
+    cancelAnimationFrame(raf);field.innerHTML="";cats=[];
+    go.textContent="🌈 Crazy mode";go.setAttribute("aria-pressed","false");
+  }
+  go.addEventListener("click",function(){on?stop():start();});
+})();
+</script>
+</body>
+</html>
